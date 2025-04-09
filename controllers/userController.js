@@ -8,7 +8,27 @@ const createToken = (id) => {
 };
 
 // Router for user Login
-const loginUser = async (req, res) => {};
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.json({ success: false, message: "user doesn't exists" });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (isMatch) {
+      const token = createToken(user._id);
+      return res.json({ success: true, message: "login successful", token });
+    } else {
+      return res.json({ success: false, message: "invalid password" });
+    }
+  } catch (error) {
+    console.log(error);
+
+    return res.json({ success: false, message: "error" });
+  }
+};
 
 // Router for user Register
 const registerUser = async (req, res) => {
