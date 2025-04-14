@@ -70,6 +70,23 @@ const registerUser = async (req, res) => {
 };
 
 // Router for admin login
-const adminLogin = async (req, res) => {};
+const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (
+      email === process.env.ADMIN_EMAIL &&
+      password === process.env.ADMIN_PASSWORD
+    ) {
+      const payload = { email };
+      const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
+      return res.json({ success: true, token });
+    } else {
+      return res.json({ success: false, message: "invalid email or password" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.json({ success: false, message: error.message });
+  }
+};
 
 module.exports = { loginUser, registerUser, adminLogin };
